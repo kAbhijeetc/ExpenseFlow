@@ -21,12 +21,16 @@ export const app = express();
 app.use(helmet());
 
 // CORS configuration allowing cookies and credential forwarding
-const allowedOrigin = process.env.CLIENT_URL || 'http://localhost:5173';
+
+const allowedOrigins = [
+  process.env.CLIENT_URL,
+  'http://localhost:5173',
+];
+
 app.use(
   cors({
     origin: (origin, callback) => {
-      // Allow requests with no origin (like mobile apps, curl, postman) or matching origin
-      if (!origin || origin === allowedOrigin || origin.startsWith('http://localhost:')) {
+      if (!origin || allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
         callback(new Error('Blocked by CORS policy'));
@@ -37,6 +41,7 @@ app.use(
     allowedHeaders: ['Content-Type', 'Authorization'],
   })
 );
+
 
 // Body and cookie parsing
 app.use(express.json({ limit: '10mb' }));
